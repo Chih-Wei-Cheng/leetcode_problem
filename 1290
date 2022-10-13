@@ -1,0 +1,36 @@
+#include<stdio.h>
+#include<stdlib.h>
+
+struct ListNode {
+    int val;
+    struct ListNode *next;
+};
+
+int getDecimalValue(struct ListNode* head){
+    int ans = 0;
+    while(head){
+        ans <<= 1;
+        ans |= head->val;
+        head = head->next;
+    }
+    return ans;
+}
+
+int main(){
+	struct ListNode *head = (struct ListNode *)malloc(sizeof(struct ListNode));
+	int ans;
+	head->next = NULL;
+	head->val = 1;
+	struct ListNode *current = head;
+	for(int i = 0 ; i < 3 ; i++){
+		current->next = (struct ListNode *)malloc(sizeof(struct ListNode));
+		current = current->next;
+		current->val = i & 1;
+		current->next = NULL;
+	}
+	
+	ans = getDecimalValue(head);
+	printf("ans is %d\n", ans);
+	
+	return 0;
+}
