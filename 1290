@@ -31,6 +31,7 @@ int main(){
 	
 	ans = getDecimalValue(head);
 	printf("ans is %d\n", ans);
-	
+	free(head);
+	free(current);
 	return 0;
 }
