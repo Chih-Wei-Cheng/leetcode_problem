@@ -1,0 +1,35 @@
+#include <stdlib.h>
+#include <stdio.h>
+const int array[3] = {1, 0, 1};
+
+struct ListNode
+{
+	int val;
+	struct ListNode *next = NULL;
+};
+void create_list(struct ListNode **cur){
+	for(int i = 0 ; i < 3 ; i++){
+		struct ListNode *new_node = (struct ListNode *)malloc(sizeof(struct ListNode));
+		new_node->val = array[i];
+		new_node->next = NULL;
+		*cur = new_node;
+		cur = &((*cur)->next);
+	}
+}
+int getDecimalValue(struct ListNode* head){
+    int ans = 0;
+    while(head){
+        ans <<= 1;
+        ans |= head->val;
+        head = head->next;
+    }
+    return ans;
+}
+int main(){
+	struct ListNode *head = NULL;
+	int ans;
+	create_list(&head);
+	ans = getDecimalValue(head);
+	printf("ans is %d\n",ans);
+	return 0;
+}
