@@ -1,0 +1,102 @@
+.global _start
+
+.set SYSEXIT, 93
+.set SYSWRITE, 64
+
+.data
+
+array:
+        .word 1
+        .word 0
+        .word 1
+answer:
+        .word 5
+correct:
+        .ascii "correct!\n"
+        .set correct_size, .-correct
+wrong:
+        .ascii "wrong answer\n"
+        .set wrong_size, .-wrong
+
+.text
+_start:
+main:
+        addi sp, sp, -4         # head pointer
+        sw x0, 0(sp)            # head = NULL
+        la s0, array            # s0 = array[1,0,1]
+        la s1, answer           # s1 = answer address
+        sw s1, 0(s1)            # s1 = 5
+        add a0, sp, x0          # head pointer's address
+        jal ra, createList
+        lw a0, 0(sp)
+        jal ra, getDecimalValue
+        bne a0, s1, wrongAnswer
+        li a7, SYSWRITE
+        li a0, 1
+        la a1, correct
+        li a2, correct_size
+        ecall
+exit:   li a7, SYSEXIT
+        li a0, 0
+        li a1, 0
+        li a2, 0
+        addi sp, sp, 4
+        ecall
+
+wrongAnswer:
+        li a7, SYSWRITE
+        li a0, 1
+        la a1, wrong
+        li a2, wrong_size
+        ecall
+        j exit
+
+createList:
+        addi sp, sp, -12        # store ra, s0, s1 (callee save)
+        sw ra, 0(sp)
+        sw s0, 4(sp)
+        sw s1, 8(sp)
+        mv s0, a0               # s0 = head pointer address
+        li a0, 8                # allocate 8 byte for structure ListNode
+        li a7, 214              # system call malloc
+        ecall
+        sw a0, 0(s0)            # head pointer points to first node
+        li t0, 1                # value = 1
+        sw t0, 0(a0)
+        mv t1, a0               # t1 = first node address
+        li a0, 8
+        ecall                   # malloc second node
+        sw a0, 4(t1)            # first node points to second node
+        li t0, 0                # value = 0
+        sw t0, 0(a0)
+        mv t1, a0               # t1 = second node address
+        li a0, 8
+        ecall
+        sw a0, 4(t1)            # second node points to third node
+        li t0, 1                # value = 1
+        sw t0, 0(a0)
+        sw x0, 4(a0)            # third node's next pointer point to NULL
+        lw ra, 0(sp)            # restore register value in stack
+        lw s0, 4(sp)
+        lw s1, 8(sp)
+        addi sp, sp, 12
+        jr ra
+
+getDecimalValue:
+        addi sp, sp, -8         # store ra, s0(for a new pointer)
+        sw ra, 0(sp)
+        sw s0, 4(sp)
+        mv s0, a0
+        li a0, 0                # a0 = answer
+        loop:
+        beq s0, x0, exitLoop
+        slli a0, a0, 1          # answer shift left 1
+        lw t0, 0(s0)            # t0 = current node value
+        or a0, a0, t0           # answer = answer | current node value
+        lw s0, 4(s0)            # head = head->next
+        j loop
+        exitLoop:
+        lw ra, 0(sp)
+        lw s0, 4(sp)
+        addi sp, sp, 8
+        jr ra
