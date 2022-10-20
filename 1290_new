@@ -30,6 +30,10 @@ int main(){
 	int ans;
 	create_list(&head);
 	ans = getDecimalValue(head);
-	printf("ans is %d\n",ans);
+	if(ans == 5){
+		printf("correct!\n");
+	}else{
+		printf("wrong\n");
+	}
 	return 0;
 }
